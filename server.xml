@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<server description="Default server">
+
+    <!-- Enable features -->
+    <featureManager>
+        <feature>javaee-7.0</feature>
+      	<feature>adminCenter-1.0</feature>
+        <feature>oauth-2.0</feature>
+    </featureManager>
+
+    <!-- Define your admin user name and password -->
+    <quickStartSecurity userName="admin" userPassword="password"/>
+
+    <!-- Define a keystore for the HTTPS port -->
+    <keyStore id="defaultKeyStore" password="Liberty"/>
+
+    <!-- Allows remote file access for config changes -->
+    <remoteFileAccess>
+        <writeDir>${server.config.dir}</writeDir>
+    </remoteFileAccess>
+
+    <!-- This template enables security. To get the full use of all the capabilities, a keystore and user registry are required. -->
+
+    <basicRegistry id="basic" realm="BasicRealm">
+         <user name="admin" password="admin" />
+    </basicRegistry>
+
+    <administrator-role>
+        <user>admin</user>
+    </administrator-role>
+
+    <!-- To allow access to this server from a remote client host="*" has been added to the following element -->
+    <httpEndpoint id="defaultHttpEndpoint"
+                  host="*"
+      		  httpPort="9080"
+                  httpsPort="9443" />
+
+    <!-- Automatically expand WAR files and EAR files -->
+    <applicationManager autoExpand="true"/>
+
+    <oauthProvider id="DemoProvider"
+    filter="request-url%=testpage"
+    oauthOnly="true"
+    grantType="authorization_code,password,refresh_token"
+    libraryRef="myLib"
+    mediatorClass-name="com.ibm.ws.security.oauth20.mediator.ResourceOwnerValidationMedidator">
+        <localStore>
+            <client name="LibertyRocks" secret="AndMakesConfigurationEasy"
+                    displayname="Test Client for OAuth"
+                    redirect="http://example.com/oauthclient/redirect.jsp"
+                    enabled="true">
+            </client>
+        </localStore>
+    </oauthProvider>
+
+
+
+    <library id="myLib">
+        <fileset dir="/opt/ibm/wlp/lib" 
+        includes="com.ibm.ws.security.oauth20_1.1.12.jar,com.ibm.ws.logging_1.0.12.jar" />
+    </library>
+</server>
